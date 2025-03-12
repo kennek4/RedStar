@@ -20,3 +20,4 @@ CMakeUserPresets.json
 # Local
 .cache/
 out/
+build/

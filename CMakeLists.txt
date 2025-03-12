@@ -28,19 +28,14 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
 # Directories
-set(SCRIPT_DIR "scripts/")
-set(HEADER_DIR "scripts/headers/")
-set(CLASSES_DIR "scripts/classes/")
+set(SRC_DIR "src")
 
 # Source files
-set(SCRIPT_SOURCES ${SCRIPT_DIR}main.cpp)
-set(HEADER_SOURCES ${HEADER_DIR})
-set(CLASS_SOURCES ${CLASSES_DIR})
+set(MAIN_FILE ${SRC_DIR}/main.cpp)
 
 # Create your game executable target as usual
-add_executable(REDSTAR ${HEADER_SOURCES} ${CLASS_SOURCES} ${SCRIPT_SOURCES})
-
-target_include_directories(REDSTAR PRIVATE scripts)
+add_executable(REDSTAR ${MAIN_FILE})
+target_include_directories(REDSTAR PRIVATE src)
 
 # Link to the actual SDL3 library.
 target_link_libraries(REDSTAR PRIVATE SDL3_image::SDL3_image SDL3::SDL3
