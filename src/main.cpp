@@ -1,3 +1,4 @@
+#include "shader.hpp"
 #include "shader_loader.hpp"
 #include <GL/gl.h>
 #include <GLES2/gl2.h>
@@ -106,14 +107,7 @@ int main(int argc, char *argv[]) {
   SDL_Event event;
   bool finished = false;
 
-  unsigned int shaderProgram = glCreateProgram();
-
-  ShaderLoader *shaderLoader = new ShaderLoader();
-  bool success = shaderLoader->compileShaders(&shaderProgram);
-  if (!success) {
-    std::cout << "Compiling failed, now exiting program.";
-    endProgram();
-  }
+  Shader triangleShader("shaders/vert/vertex.vert", "shaders/frag/shader.frag");
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
@@ -148,15 +142,39 @@ int main(int argc, char *argv[]) {
   glBindVertexArray(0);
   while (!finished) {
     while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_EVENT_KEY_DOWN &&
-          event.key.scancode == SDL_SCANCODE_ESCAPE) {
-        finished = true;
+
+      if (event.type == SDL_EVENT_KEY_DOWN) {
+        switch (event.key.scancode) {
+        case SDL_SCANCODE_ESCAPE:
+          finished = true;
+          break;
+        case SDL_SCANCODE_R:
+          triangleShader.setFloat("red", 1.0f);
+          triangleShader.setFloat("green", 0.0f);
+          triangleShader.setFloat("blue", 0.0f);
+          break;
+        case SDL_SCANCODE_G:
+          triangleShader.setFloat("red", 0.0f);
+          triangleShader.setFloat("green", 1.0f);
+          triangleShader.setFloat("blue", 0.0f);
+          break;
+        case SDL_SCANCODE_B:
+          triangleShader.setFloat("red", 0.0f);
+          triangleShader.setFloat("green", 0.0f);
+          triangleShader.setFloat("blue", 1.0f);
+          break;
+
+        default:
+          break;
+        }
       }
 
+      // Background colour
       glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      glUseProgram(shaderProgram);
+      triangleShader.use();
+
       glBindVertexArray(VAO);
       glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -166,7 +184,6 @@ int main(int argc, char *argv[]) {
 
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
-  glDeleteProgram(shaderProgram);
 
   endProgram();
 }
