@@ -35,7 +35,7 @@ set(MAIN_FILE ${SRC_DIR}/main.cpp)
 
 # Create your game executable target as usual
 add_executable(REDSTAR ${MAIN_FILE})
-target_include_directories(REDSTAR PRIVATE src)
+target_include_directories(REDSTAR PRIVATE src shaders)
 
 # Link to the actual SDL3 library.
 target_link_libraries(REDSTAR PRIVATE SDL3_image::SDL3_image SDL3::SDL3
