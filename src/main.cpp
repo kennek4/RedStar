@@ -1,3 +1,5 @@
+#include "shader.hpp"
+#include "shader_loader.hpp"
 #include <GL/gl.h>
 #include <GLES2/gl2.h>
 #include <GLES3/gl3.h>
@@ -17,7 +19,6 @@
 #include <cstddef>
 #include <glm/vec3.hpp>
 #include <iostream>
-#include <ostream>
 #include <utility>
 
 #define NUM_OF_SUBSYSTEMS 3
@@ -106,46 +107,7 @@ int main(int argc, char *argv[]) {
   SDL_Event event;
   bool finished = false;
 
-  // build and compile our shader program
-  // ------------------------------------
-  // vertex shader
-  unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-  // check for shader compile errors
-  int success;
-  char infoLog[512];
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-              << infoLog << std::endl;
-  }
-  // fragment shader
-  unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-  // check for shader compile errors
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-              << infoLog << std::endl;
-  }
-  // link shaders
-  unsigned int shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  // check for linking errors
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-              << infoLog << std::endl;
-  }
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  Shader triangleShader("shaders/vert/vertex.vert", "shaders/frag/shader.frag");
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
@@ -180,15 +142,39 @@ int main(int argc, char *argv[]) {
   glBindVertexArray(0);
   while (!finished) {
     while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_EVENT_KEY_DOWN &&
-          event.key.scancode == SDL_SCANCODE_ESCAPE) {
-        finished = true;
+
+      if (event.type == SDL_EVENT_KEY_DOWN) {
+        switch (event.key.scancode) {
+        case SDL_SCANCODE_ESCAPE:
+          finished = true;
+          break;
+        case SDL_SCANCODE_R:
+          triangleShader.setFloat("red", 1.0f);
+          triangleShader.setFloat("green", 0.0f);
+          triangleShader.setFloat("blue", 0.0f);
+          break;
+        case SDL_SCANCODE_G:
+          triangleShader.setFloat("red", 0.0f);
+          triangleShader.setFloat("green", 1.0f);
+          triangleShader.setFloat("blue", 0.0f);
+          break;
+        case SDL_SCANCODE_B:
+          triangleShader.setFloat("red", 0.0f);
+          triangleShader.setFloat("green", 0.0f);
+          triangleShader.setFloat("blue", 1.0f);
+          break;
+
+        default:
+          break;
+        }
       }
 
+      // Background colour
       glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      glUseProgram(shaderProgram);
+      triangleShader.use();
+
       glBindVertexArray(VAO);
       glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -198,7 +184,6 @@ int main(int argc, char *argv[]) {
 
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
-  glDeleteProgram(shaderProgram);
 
   endProgram();
 }
