@@ -1,5 +1,4 @@
 #include "shader.hpp"
-#include "shader_loader.hpp"
 #include <GL/gl.h>
 #include <GLES2/gl2.h>
 #include <GLES3/gl3.h>
@@ -18,7 +17,6 @@
 #include <SDL3/SDL_video.h>
 #include <cstddef>
 #include <glm/vec3.hpp>
-#include <iostream>
 #include <utility>
 
 #define NUM_OF_SUBSYSTEMS 3
@@ -32,20 +30,6 @@ static SDL_Renderer *programRenderer = NULL;
 static SDL_GLContext gContext = NULL;
 static GLuint gProgramID = 0;
 
-const char *vertexShaderSource =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
 const std::pair<unsigned int, const char *> SUBSYSTEMS[NUM_OF_SUBSYSTEMS]{
     {SDL_INIT_VIDEO, "VIDEO"}, {SDL_INIT_AUDIO, "AUDIO"}};
 
@@ -112,9 +96,10 @@ int main(int argc, char *argv[]) {
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
   float vertices[] = {
-      -0.5f, -0.5f, 0.0f, // left
-      0.5f,  -0.5f, 0.0f, // right
-      0.0f,  0.5f,  0.0f  // top
+      // Position                 Colours
+      -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left
+      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // right
+      0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
   };
 
   unsigned int VBO, VAO;
@@ -127,8 +112,14 @@ int main(int argc, char *argv[]) {
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  // Vertex position attribute
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
+
+  // The colour attribute
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                        (void *)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   // note that this is allowed, the call to glVertexAttribPointer registered VBO
   // as the vertex attribute's bound vertex buffer object so afterwards we can
@@ -140,6 +131,10 @@ int main(int argc, char *argv[]) {
   // call to glBindVertexArray anyways so we generally don't unbind VAOs (nor
   // VBOs) when it's not directly necessary.
   glBindVertexArray(0);
+
+  float hOffSet = 0.0f;
+  float vOffSet = 0.0f;
+
   while (!finished) {
     while (SDL_PollEvent(&event)) {
 
@@ -148,25 +143,29 @@ int main(int argc, char *argv[]) {
         case SDL_SCANCODE_ESCAPE:
           finished = true;
           break;
-        case SDL_SCANCODE_R:
-          triangleShader.setFloat("red", 1.0f);
-          triangleShader.setFloat("green", 0.0f);
-          triangleShader.setFloat("blue", 0.0f);
+
+        case SDL_SCANCODE_W:
+          vOffSet += 0.1f;
           break;
-        case SDL_SCANCODE_G:
-          triangleShader.setFloat("red", 0.0f);
-          triangleShader.setFloat("green", 1.0f);
-          triangleShader.setFloat("blue", 0.0f);
+
+        case SDL_SCANCODE_A:
+          hOffSet -= 0.1f;
           break;
-        case SDL_SCANCODE_B:
-          triangleShader.setFloat("red", 0.0f);
-          triangleShader.setFloat("green", 0.0f);
-          triangleShader.setFloat("blue", 1.0f);
+
+        case SDL_SCANCODE_S:
+          vOffSet -= 0.1f;
+          break;
+
+        case SDL_SCANCODE_D:
+          hOffSet += 0.1f;
           break;
 
         default:
           break;
         }
+
+        triangleShader.setFloat("hOffSet", hOffSet);
+        triangleShader.setFloat("vOffSet", vOffSet);
       }
 
       // Background colour
