@@ -24,19 +24,25 @@ endif()
 # Get OpenGL Packages
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
-# Directories
-set(SRC_DIR "src")
-
 # Source files
-set(MAIN_FILE ${SRC_DIR}/main.cpp)
+set(MAIN_FILE src/main.cpp)
+
+set(CORE_EVENTS include/core/events/rs_event_listener.cpp
+                include/core/events/rs_event_manager.cpp)
+
+set(CORE_SYSTEMS include/core/systems/rs_render.cpp
+                 include/core/systems/rs_window.cpp)
+
+set(CORE_ENGINE include/core/engine.cpp)
 
 # Create your game executable target as usual
-add_executable(REDSTAR ${MAIN_FILE})
-target_include_directories(REDSTAR PRIVATE src shaders)
+add_executable(REDSTAR ${MAIN_FILE} ${CORE_EVENTS} ${CORE_SYSTEMS})
+target_include_directories(
+  REDSTAR PRIVATE src shaders include include/core/events include/core/systems
+                  include/core/shaders)
 
 # Link to the actual SDL3 library.
 target_link_libraries(REDSTAR PRIVATE SDL3_image::SDL3_image SDL3::SDL3
-                                      OpenGL::OpenGL ${GLFW3_LIBRARY})
+                                      OpenGL::OpenGL)

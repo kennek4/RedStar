@@ -1,3 +1,5 @@
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 #include "shader.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -241,3 +243,20 @@ int main(int argc, char *argv[]) {
 
   endProgram();
 }
+=======
+#include "core/engine.h"
+
+int main(int argc, char *argv[]) {
+=======
+#include "core/engine.h"
+
+int main(int argc, char *argv[]) {
+>>>>>>> Stashed changes
+  RS::Engine *engine = new RS::Engine(0, 1, 0);
+  delete engine;
+  return 0;
+};
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
