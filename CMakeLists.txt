@@ -38,7 +38,8 @@ set(CORE_SYSTEMS include/core/systems/rs_render.cpp
 set(CORE_ENGINE include/core/engine.cpp)
 
 # Create your game executable target as usual
-add_executable(REDSTAR ${MAIN_FILE} ${CORE_EVENTS} ${CORE_SYSTEMS})
+add_executable(REDSTAR ${MAIN_FILE} ${CORE_EVENTS} ${CORE_SYSTEMS}
+                       ${CORE_ENGINE})
 target_include_directories(
   REDSTAR PRIVATE src shaders include include/core/events include/core/systems
                   include/core/shaders)
