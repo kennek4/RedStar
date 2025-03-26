@@ -1,7 +1,5 @@
-
-### Current Status: _WIP_ :pushpin:
-
 ## What is RedStar3D? 🤔
+### Current Status: _WIP_ :pushpin:
 **RedStar3D** is a game engine made with _OpenGL_ and _SDL3_.
 
 ## Technologies Used 🕹️
