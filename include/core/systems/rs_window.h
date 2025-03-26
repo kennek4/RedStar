@@ -28,8 +28,10 @@ public:
 
   void emitEvent(const RS_EVENT event) override;
   inline void update(const RS_EVENT event) override;
-
   // Getters
+  inline SDL_Window *getWindow() { return _window; };
+  inline GLuint getGLProgramID() { return _gl_program_id; };
+
   // Setters
 
   // SDL3

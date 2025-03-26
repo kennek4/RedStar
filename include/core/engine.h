@@ -5,8 +5,8 @@
 #include "rs_render.h"
 #include "rs_system.h"
 #include "rs_window.h"
+#include <SDL3/SDL_video.h>
 #include <cstdio>
-#include <iostream>
 #include <string>
 #include <sys/types.h>
 #include <vector>
@@ -30,6 +30,7 @@ public:
   };
 
   inline const char *getEngineVersion() { return _engine_ver; };
+  inline SDL_Window *getWindow() { return _window_system->getWindow(); };
 
 private:
   void setMetaData() {
